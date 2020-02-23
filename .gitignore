@@ -1,2 +1,4 @@
 .env
 node_modules
+try.js
+other/temp/image/*
