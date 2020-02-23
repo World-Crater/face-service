@@ -49,3 +49,34 @@ exports.selectByID = async function (faceID) {
     return [null, err]
   }
 }
+
+exports.insertFace = async function (token, preview, infoId) {
+  try {
+    const sql = `
+    INSERT INTO
+    facefaces (token, preview, infoid)
+    VALUES ($1, $2, $3);
+    `
+    const sqlParams = [token, preview, infoId]
+    const result = await pgPool.query(sql, sqlParams)
+    return [result, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
+exports.searchInfoIdBySimilarName = async function (similarName) {
+  try {
+    const sql = `
+    SELECT
+    *
+    FROM faceinfos
+    WHERE name LIKE $1
+    `
+    const sqlParams = [`%${similarName}%`]
+    const result = await pgPool.query(sql, sqlParams)
+    return [result, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
