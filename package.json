@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --inspect -r dotenv/config index.js"
+    "dev": "nodemon --inspect=9229 -r dotenv/config index.js",
+    "unitTest": "jest",
+    "watchUnitTest": "npm run unitTest -- --watch"
   },
   "repository": {
     "type": "git",

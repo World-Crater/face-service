@@ -18,9 +18,9 @@ router.post('/',
     faceController.createFacesByImage
 )
 
-// TODO
-// router.delete('/:id',
-//     faceFaceController.destroy
-// )
+router.post('/search',
+    upload.single('image'),
+    faceController.searchFacesByImage
+)
 
 module.exports = router;

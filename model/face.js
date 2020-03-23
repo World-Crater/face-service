@@ -50,6 +50,48 @@ exports.selectByID = async function (faceID) {
   }
 }
 
+exports.selectByToken = async function (token) {
+  try {
+    const sql = `
+    SELECT
+    *
+    FROM
+    faceinfos
+    INNER JOIN facefaces
+    ON faceinfos.id = facefaces.infoid
+    WHERE facefaces.token = $1
+    `
+    const sqlParams = [token]
+    const result = await pgPool.query(sql, sqlParams)
+    return [result, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
+exports.selectByTokens = async function (tokens) {
+  try {
+    const sqlCondition = tokens
+      .map((_, index) => `facefaces.token = $${index + 1}`)
+      .join(' OR ')
+    const sql = `
+    SELECT
+    *
+    FROM
+    faceinfos
+    INNER JOIN facefaces
+    ON faceinfos.id = facefaces.infoid
+    WHERE ${sqlCondition}
+    `
+    const sqlParams = tokens
+    const result = await pgPool.query(sql, sqlParams)
+    return [result, null]
+  } catch (err) {
+    console.log(err)
+    return [null, err]
+  }
+}
+
 exports.insertFace = async function (token, preview, infoId) {
   try {
     const sql = `

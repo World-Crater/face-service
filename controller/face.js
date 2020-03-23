@@ -1,5 +1,6 @@
 const faceModel = require('../model/face.js');
 const faceppModel = require('../model/facepp.js');
+const faceUtil = require('../util/face')
 
 const faceppObject = new faceppModel(
   process.env.FACEPP_KEY,
@@ -7,7 +8,7 @@ const faceppObject = new faceppModel(
   process.env.FACEPP_FACESET
 )
 
-exports.getFacesByID = async function (req, res, next) {
+const getFacesByID = async function (req, res, next) {
   try {
     const [selectByIDResult, selectByIDError] = await faceModel.selectByID(req.params.faceID)
     if (selectByIDError) {
@@ -24,7 +25,7 @@ exports.getFacesByID = async function (req, res, next) {
   }
 }
 
-exports.searchFacesBySimilarName = async function (req, res, next) {
+const searchFacesBySimilarName = async function (req, res, next) {
   try {
     const [selectByIDResult, selectByIDError] = await faceModel.searchInfoIdBySimilarName(req.query.name)
     if (selectByIDError) {
@@ -41,7 +42,7 @@ exports.searchFacesBySimilarName = async function (req, res, next) {
   }
 }
 
-exports.createFacesByImage = async function (req, res, next) {
+const createFacesByImage = async function (req, res, next) {
   try {
     const [detectResult, detectError] = await faceppObject.detect(`./${req.file.path}`)
     if (detectError) {
@@ -70,4 +71,37 @@ exports.createFacesByImage = async function (req, res, next) {
     console.error(err)
     res.status(500).json('Get faces error')
   }
+}
+
+const searchFacesByImage = async function (req, res, next) {
+  try {
+    const [searchResult, searchError] = await faceppObject.search(`./${req.file.path}`)
+    if (searchError) {
+      console.error(searchError)
+      res.status(500).json('Search face error')
+      return
+    }
+    const searchResults = JSON.parse(searchResult.body).results
+    const tokens = searchResults.map(token => token.face_token)
+    const [tokenInfosResult, tokenInfosError] = await faceModel.selectByTokens(tokens)
+    if (tokenInfosError) {
+      console.error(searchError)
+      res.status(500).json('Search face error')
+      return
+    }
+    const tokenInfosHashMap = faceUtil.tokenInfosToHashMap(tokenInfosResult.rows)
+    res.json(tokens
+      .map(token => tokenInfosHashMap.get(token))
+    )
+  } catch (err) {
+    console.error(err)
+    res.status(500).json('Search faces error')
+  }
+}
+
+module.exports = {
+  getFacesByID,
+  searchFacesBySimilarName,
+  createFacesByImage,
+  searchFacesByImage
 }
