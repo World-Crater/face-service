@@ -9,6 +9,10 @@ router.get('/',
     faceController.searchFacesBySimilarName
 )
 
+router.get('/random',
+    faceController.getRandomFaces
+)
+
 router.get('/:faceID',
     faceController.getFacesByID
 )

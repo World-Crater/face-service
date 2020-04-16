@@ -83,15 +83,18 @@ const searchFacesByImage = async function (req, res, next) {
     }
     const searchResults = JSON.parse(searchResult.body).results
     const tokens = searchResults.map(token => token.face_token)
-    const [tokenInfosResult, tokenInfosError] = await faceModel.selectByTokens(tokens)
+    const [tokenInfosResult, tokenInfosError] = await faceModel.selectAllInfoAndTokenByTokens(tokens)
     if (tokenInfosError) {
       console.error(searchError)
       res.status(500).json('Search face error')
       return
     }
     const tokenInfosHashMap = faceUtil.tokenInfosToHashMap(tokenInfosResult.rows)
-    res.json(tokens
-      .map(token => tokenInfosHashMap.get(token))
+    res.json(searchResults
+      .map(searchResult => ({
+        ...tokenInfosHashMap.get(searchResult.face_token),
+        recognitionPercentage: searchResult.confidence
+      }))
     )
   } catch (err) {
     console.error(err)
@@ -99,9 +102,18 @@ const searchFacesByImage = async function (req, res, next) {
   }
 }
 
+async function getRandomFaces (req, res, next) {
+  const [randomSelectAllResult, randomSelectAllError] = await faceModel.randomSelectInfos(req.query.quantity)
+  if (randomSelectAllError) {
+    // todo: error handling
+  }
+  res.json(randomSelectAllResult.rows)
+}
+
 module.exports = {
   getFacesByID,
   searchFacesBySimilarName,
   createFacesByImage,
-  searchFacesByImage
+  searchFacesByImage,
+  getRandomFaces
 }

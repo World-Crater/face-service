@@ -10,11 +10,11 @@ Pool.mockImplementation(() => {
 const faceModel = require('../../model/face')
 
 test('should get face array', async () => {
-  await faceModel.selectByTokens(['1', '2', '3'])
+  await faceModel.selectAllInfoAndTokenByTokens(['1', '2', '3'])
   expect(spyQuery).toHaveBeenCalledWith(
     `
     SELECT
-    *
+    faceinfos.*, facefaces.token
     FROM
     faceinfos
     INNER JOIN facefaces

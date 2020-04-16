@@ -31,6 +31,22 @@ exports.selectAll = async function () {
   }
 }
 
+exports.randomSelectInfos = async function (quantity) {
+  try {
+    const sql = `
+    SELECT
+    *
+    FROM faceinfos
+    ORDER BY RANDOM()
+    LIMIT $1
+    `
+    const sqlParams = [quantity]
+    return [await pgPool.query(sql, sqlParams), null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
 exports.selectByID = async function (faceID) {
   try {
     const sql = `
@@ -69,14 +85,14 @@ exports.selectByToken = async function (token) {
   }
 }
 
-exports.selectByTokens = async function (tokens) {
+exports.selectAllInfoAndTokenByTokens = async function (tokens) {
   try {
     const sqlCondition = tokens
       .map((_, index) => `facefaces.token = $${index + 1}`)
       .join(' OR ')
     const sql = `
     SELECT
-    *
+    faceinfos.*, facefaces.token
     FROM
     faceinfos
     INNER JOIN facefaces
