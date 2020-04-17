@@ -2,3 +2,4 @@
 node_modules
 try.js
 other/temp/image/*
+other/**/*.DS_Store
