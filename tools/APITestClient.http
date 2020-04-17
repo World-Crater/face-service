@@ -1,0 +1,38 @@
+@url=http://localhost:5000
+
+### Get random faces
+GET {{url}}/faces/random?quantity=2 HTTP/1.1
+
+### Search face by image
+POST {{url}}/faces/search HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="../other/temp/image/test.jpg"
+Content-Type: image/jpg
+
+< ../other/temp/image/test.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Add face by image
+POST {{url}}/faces HTTP/1.1
+Content-Type: multipart/form-data; boundary=---WebKitFormBoundary7MA4YWxkTrZu0gW
+
+-----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="../other/temp/image/test.jpg"
+Content-Type: image/jpg
+
+< ../other/temp/image/test.jpg
+-----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="previewURL"
+
+https://i.imgur.com/UyF3AUC.jpg
+-----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="infoId"
+
+2
+-----WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Search faces by similar name
+GET {{url}}/faces/?name=上原亞衣 HTTP/1.1
+
