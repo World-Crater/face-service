@@ -32,7 +32,7 @@ class facepp {
     }
   }
 
-  async search(imagePath) {
+  async search(imagePath, resultCount = 1) {
     try {
       const image = fs.createReadStream(imagePath)
       const result = await request({
@@ -45,7 +45,8 @@ class facepp {
         qs: {
           api_key: this.faceppKey,
           api_secret: this.faceppSecret,
-          faceset_token: this.faceppFaceset
+          faceset_token: this.faceppFaceset,
+          return_result_count: resultCount
         },
         formData: {
           image_file: image

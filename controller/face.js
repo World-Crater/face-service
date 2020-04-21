@@ -75,7 +75,7 @@ const createFacesByImage = async function (req, res, next) {
 
 const searchFacesByImage = async function (req, res, next) {
   try {
-    const [searchResult, searchError] = await faceppObject.search(`./${req.file.path}`)
+    const [searchResult, searchError] = await faceppObject.search(`./${req.file.path}`, 3) // TODO: 3的這個參數需改成用req動態帶入
     if (searchError) {
       console.error(searchError)
       res.status(500).json('Search face error')
