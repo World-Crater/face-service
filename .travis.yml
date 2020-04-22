@@ -1,0 +1,10 @@
+dist: trusty
+
+jobs:
+  include:
+    - stage: build docker image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker build -t face-service .
+      - docker tag face-service $DOCKER_USERNAME/face-service
+      - docker push $DOCKER_USERNAME/face-service
