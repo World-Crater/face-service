@@ -1,10 +1,12 @@
-const express = require('express');
+const express = require('express')
+const authMiddleware = require('./middleware/auth')
 
 const PORT = process.env.PORT || 5000
 
 const app = express();
 
 app.use('/faces',
+  authMiddleware.verifyToken,
   require('./route/face')
 )
 
