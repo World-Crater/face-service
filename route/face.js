@@ -9,6 +9,20 @@ router.get('/',
     faceController.searchFacesBySimilarName
 )
 
+router.get('/info',
+    faceController.getAllInfos
+)
+
+router.post('/info',
+    upload.single('preview'),
+    faceController.createInfo
+)
+
+router.put('/info/:id',
+    upload.single('preview'),
+    faceController.updateInfo
+)
+
 router.get('/random',
     faceController.getRandomFaces
 )
@@ -17,7 +31,7 @@ router.get('/:faceID',
     faceController.getFacesByID
 )
 
-router.post('/',
+router.post('/face',
     upload.single('image'),
     faceController.createFacesByImage
 )

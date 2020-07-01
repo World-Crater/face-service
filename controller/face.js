@@ -1,5 +1,6 @@
 const faceModel = require('../model/face.js');
 const faceppModel = require('../model/facepp.js');
+const imgurModel = require('../model/imgur.js')
 const faceUtil = require('../util/face')
 
 const faceppObject = new faceppModel(
@@ -25,6 +26,23 @@ const getFacesByID = async function (req, res, next) {
   }
 }
 
+const getAllInfos = async function (req, res, next) {
+  try {
+    const [selectAllResult, selectAllError] = await faceModel.selectAllInfos()
+    if (selectAllError) {
+      console.error(selectAllError)
+      res.status(500).json('Get faces error')
+      return
+    }
+    res.json(selectAllResult.rows)
+    return
+  } catch (err) {
+    console.error(err)
+    res.status(500).json('Get faces error')
+    return
+  }
+}
+
 const searchFacesBySimilarName = async function (req, res, next) {
   try {
     const [selectByIDResult, selectByIDError] = await faceModel.searchInfoIdBySimilarName(req.query.name)
@@ -39,6 +57,42 @@ const searchFacesBySimilarName = async function (req, res, next) {
     console.error(err)
     res.status(500).json('Get faces error')
     return
+  }
+}
+
+const createInfo = async function (req, res, next) {
+  try {
+    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
+    const previewURL = JSON.parse(imgurResult.body).data.link
+    const [insertFaceResult, insertFaceError] = await faceModel.insertInfo(req.body.name, req.body.romanization, req.body.detail, previewURL)
+    if (insertFaceError) {
+      console.error(insertFaceError)
+      res.status(500).json('Insert database error')
+      return
+    }
+    res.json({
+      id: insertFaceResult.rows[0].id
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json('Get faces error')
+  }
+}
+
+const updateInfo = async function (req, res, next) {
+  try {
+    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
+    const previewURL = JSON.parse(imgurResult.body).data.link
+    const [, insertFaceError] = await faceModel.updateInfo(req.body.name, req.body.romanization, req.body.detail, previewURL, req.params.id)
+    if (insertFaceError) {
+      console.error(insertFaceError)
+      res.status(500).json('Insert database error')
+      return
+    }
+    res.sendStatus(204)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json('Get faces error')
   }
 }
 
@@ -57,7 +111,9 @@ const createFacesByImage = async function (req, res, next) {
       res.status(500).json('Add face error')
       return
     }
-    const [, insertFaceError] = await faceModel.insertFace(faceToken, req.body.previewURL, req.body.infoId)
+    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
+    const previewURL = JSON.parse(imgurResult.body).data.link
+    const [, insertFaceError] = await faceModel.insertFace(faceToken, previewURL, req.body.infoId)
     if (insertFaceError) {
       console.error(detectError)
       res.status(500).json('Insert database error')
@@ -115,5 +171,8 @@ module.exports = {
   searchFacesBySimilarName,
   createFacesByImage,
   searchFacesByImage,
-  getRandomFaces
+  getRandomFaces,
+  getAllInfos,
+  createInfo,
+  updateInfo
 }

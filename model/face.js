@@ -31,6 +31,21 @@ exports.selectAll = async function () {
   }
 }
 
+exports.selectAllInfos = async function () {
+  try {
+    const sql = `
+    SELECT
+    *
+    FROM
+    faceinfos
+    `
+    const sqlParams = []
+    return [await pgPool.query(sql, sqlParams), null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
 exports.randomSelectInfos = async function (quantity) {
   try {
     const sql = `
@@ -116,6 +131,37 @@ exports.insertFace = async function (token, preview, infoId) {
     VALUES ($1, $2, $3);
     `
     const sqlParams = [token, preview, infoId]
+    const result = await pgPool.query(sql, sqlParams)
+    return [result, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
+exports.insertInfo = async function (name, romanization, detail, preview) {
+  try {
+    const sql = `
+    INSERT INTO
+    faceinfos (name, romanization, detail, preview)
+    VALUES ($1, $2, $3, $4)
+    RETURNING id
+    `
+    const sqlParams = [name, romanization, detail, preview]
+    const result = await pgPool.query(sql, sqlParams)
+    return [result, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
+exports.updateInfo = async function (name, romanization, detail, preview, id) {
+  try {
+    const sql = `
+    UPDATE faceinfos
+    SET name=$1, romanization=$2, detail=$3, preview=$4
+    WHERE id=$5
+    `
+    const sqlParams = [name, romanization, detail, preview, id]
     const result = await pgPool.query(sql, sqlParams)
     return [result, null]
   } catch (err) {
