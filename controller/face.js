@@ -98,6 +98,8 @@ const updateInfo = async function (req, res, next) {
 
 const createFacesByImage = async function (req, res, next) {
   try {
+    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
+    const previewURL = JSON.parse(imgurResult.body).data.link
     const [detectResult, detectError] = await faceppObject.detect(`./${req.file.path}`)
     if (detectError) {
       console.error(detectError)
@@ -111,8 +113,6 @@ const createFacesByImage = async function (req, res, next) {
       res.status(500).json('Add face error')
       return
     }
-    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
-    const previewURL = JSON.parse(imgurResult.body).data.link
     const [, insertFaceError] = await faceModel.insertFace(faceToken, previewURL, req.body.infoId)
     if (insertFaceError) {
       console.error(detectError)
