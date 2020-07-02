@@ -1,6 +1,6 @@
 const faceModel = require('../model/face.js');
 const faceppModel = require('../model/facepp.js');
-const imgurModel = require('../model/imgur.js')
+const fileServiceModel = require('../model/file-service.js')
 const faceUtil = require('../util/face')
 
 const faceppObject = new faceppModel(
@@ -62,8 +62,7 @@ const searchFacesBySimilarName = async function (req, res, next) {
 
 const createInfo = async function (req, res, next) {
   try {
-    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
-    const previewURL = JSON.parse(imgurResult.body).data.link
+    const previewURL = (await fileServiceModel.uploadImage(`./${req.file.path}`)).body.url
     const [insertFaceResult, insertFaceError] = await faceModel.insertInfo(req.body.name, req.body.romanization, req.body.detail, previewURL)
     if (insertFaceError) {
       console.error(insertFaceError)
@@ -81,8 +80,7 @@ const createInfo = async function (req, res, next) {
 
 const updateInfo = async function (req, res, next) {
   try {
-    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
-    const previewURL = JSON.parse(imgurResult.body).data.link
+    const previewURL = (await fileServiceModel.uploadImage(`./${req.file.path}`)).body.url
     const [, insertFaceError] = await faceModel.updateInfo(req.body.name, req.body.romanization, req.body.detail, previewURL, req.params.id)
     if (insertFaceError) {
       console.error(insertFaceError)
@@ -98,8 +96,7 @@ const updateInfo = async function (req, res, next) {
 
 const createFacesByImage = async function (req, res, next) {
   try {
-    const imgurResult = await imgurModel.uploadImage(`./${req.file.path}`)
-    const previewURL = JSON.parse(imgurResult.body).data.link
+    const previewURL = (await fileServiceModel.uploadImage(`./${req.file.path}`)).body.url
     const [detectResult, detectError] = await faceppObject.detect(`./${req.file.path}`)
     if (detectError) {
       console.error(detectError)
