@@ -2,6 +2,7 @@ const fs = require('fs')
 const request = require('request')
 const rp = require("request-promise")
 const crypto = require('crypto')
+const R = require('ramda')
 
 // Please writing this arguments
 const TOKEN = ''
@@ -72,11 +73,14 @@ const getAllInfos = () => {
 
 const isFaceInfoExist = (infos, infoName) => (infos.filter(item => item.name === infoName).length > 0) ? true : false
 
-const readList = list => list
-  .split('\n')
-  .map(item => item.split(','))
-  .map(item => ({name: item[0], url: item[item.length - 1]}))
-  .slice(0, -1)
+const readList = list => R.pipe(
+  R.split('\n'),
+  R.slice(0, -1),
+  R.reduce((a, b) => !a[b] ? R.assoc(b, true, a) : a, {}),
+  item => Object.keys(item),
+  R.map(item => item.split(',')),
+  R.map(item => ({name: item[0], url: item[item.length - 1]}))
+)(list)
 
 const sleep = seconds => {
   return new Promise(resolve => {

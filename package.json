@@ -29,6 +29,7 @@
     "node-fetch": "^2.6.0",
     "nodemon": "^2.0.2",
     "pg": "^7.18.1",
+    "ramda": "^0.27.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.5"
   },
