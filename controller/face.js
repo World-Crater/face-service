@@ -28,13 +28,19 @@ const getFacesByID = async function (req, res, next) {
 
 const getAllInfos = async function (req, res, next) {
   try {
-    const [selectAllResult, selectAllError] = await faceModel.selectAllInfos()
-    if (selectAllError) {
-      console.error(selectAllError)
-      res.status(500).json('Get faces error')
-      return
-    }
-    res.json(selectAllResult.rows)
+    const limit = parseInt(req.query.limit)
+    const offset = parseInt(req.query.offset)
+
+    const [countAllInfosResult, countAllInfosError] = await faceModel.countAllInfos()
+    if (countAllInfosError) throw countAllInfosError
+    const [selectAllResult, selectAllError] = await faceModel.selectAllInfos(limit, offset)
+    if (selectAllError) throw selectAllError
+    res.json({
+      limit: limit,
+      offset: offset,
+      count: countAllInfosResult,
+      rows: selectAllResult.rows
+    })
     return
   } catch (err) {
     console.error(err)

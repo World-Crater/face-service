@@ -1,4 +1,7 @@
 const { Pool } = require('pg')
+const R = require('ramda')
+const _ = require('lodash')
+
 const pgOptions = {
   host: process.env.PG_ENDPOINT,
   port: process.env.PG_PORT,
@@ -31,15 +34,36 @@ exports.selectAll = async function () {
   }
 }
 
-exports.selectAllInfos = async function () {
+exports.countAllInfos = async function () {
+  try {
+    const sql = `
+    SELECT COUNT (id)
+    FROM faceinfos
+    `
+    const sqlParams = []
+    const result = await pgPool.query(sql, sqlParams)
+    const count = R.pipe(
+      R.path(['rows', [0], 'count']),
+      value => value === null ? new Error('Count Infos error') : value,
+      parseInt
+    )(result)
+    if (_.isError(count)) throw count
+    return [count, null]
+  } catch (err) {
+    return [null, err]
+  }
+}
+
+exports.selectAllInfos = async function (limit, offset) {
   try {
     const sql = `
     SELECT
     *
     FROM
     faceinfos
+    LIMIT $1 OFFSET $2
     `
-    const sqlParams = []
+    const sqlParams = [limit, offset]
     return [await pgPool.query(sql, sqlParams), null]
   } catch (err) {
     return [null, err]
