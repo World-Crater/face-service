@@ -61,6 +61,7 @@ exports.selectAllInfos = async function (limit, offset) {
     *
     FROM
     faceinfos
+    ORDER BY id
     LIMIT $1 OFFSET $2
     `
     const sqlParams = [limit, offset]
