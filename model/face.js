@@ -11,7 +11,7 @@ const pgOptions = {
   max: 5,
   idleTimeoutMillis: 5000,
   ssl: false,
-  connectionTimeoutMillis: 10000
+  connectionTimeoutMillis: 10000,
 }
 
 const pgPool = new Pool(pgOptions)
@@ -44,7 +44,7 @@ exports.countAllInfos = async function () {
     const result = await pgPool.query(sql, sqlParams)
     const count = R.pipe(
       R.path(['rows', [0], 'count']),
-      value => value === null ? new Error('Count Infos error') : value,
+      (value) => (value === null ? new Error('Count Infos error') : value),
       parseInt
     )(result)
     if (_.isError(count)) throw count
@@ -54,13 +54,19 @@ exports.countAllInfos = async function () {
   }
 }
 
-exports.selectAllInfos = async function (limit, offset) {
+exports.selectAllInfos = async function (limit, offset, nameFilter = '') {
   try {
+    const checkNameFilter = nameFilter.match(/name='[^~!@#$%^&*()_+|}{.<>/ ]+'/)
+    if (nameFilter !== '' && (!checkNameFilter || checkNameFilter[0] !== nameFilter))
+      throw [null, new Error('Error format')]
+
+    const sqlWhere = nameFilter !== '' ? `WHERE ${nameFilter}` : ''
     const sql = `
     SELECT
     *
     FROM
     faceinfos
+    ${sqlWhere}
     ORDER BY id
     LIMIT $1 OFFSET $2
     `
@@ -127,9 +133,7 @@ exports.selectByToken = async function (token) {
 
 exports.selectAllInfoAndTokenByTokens = async function (tokens) {
   try {
-    const sqlCondition = tokens
-      .map((_, index) => `facefaces.token = $${index + 1}`)
-      .join(' OR ')
+    const sqlCondition = tokens.map((_, index) => `facefaces.token = $${index + 1}`).join(' OR ')
     const sql = `
     SELECT
     faceinfos.*, facefaces.token

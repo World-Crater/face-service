@@ -23,11 +23,13 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "folktale": "^2.3.2",
     "form-data": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.0",
     "nodemon": "^2.0.2",
+    "ow": "^0.17.0",
     "pg": "^7.18.1",
     "ramda": "^0.27.0",
     "request": "^2.88.2",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "jssoup": "0.0.11",
+    "prettier": "2.0.5",
     "x-ray": "^2.3.4"
   }
 }
