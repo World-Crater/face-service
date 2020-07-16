@@ -29,7 +29,7 @@ const getAllInfos = async function (req, res, next) {
 
     const [countAllInfosResult, countAllInfosError] = await faceModel.countAllInfos()
     if (countAllInfosError) throw countAllInfosError
-    const [selectAllResult, selectAllError] = await faceModel.selectAllInfos(limit, offset, req.query.filter)
+    const [selectAllResult, selectAllError] = await faceModel.selectAllInfos(limit, offset, req.query.likeName)
     if (selectAllError) throw selectAllError
     res.json({
       limit: limit,

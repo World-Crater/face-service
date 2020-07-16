@@ -18,7 +18,7 @@ router.get(
     query: {
       limit: ow.optional.string,
       offset: ow.optional.string,
-      filter: ow.optional.string,
+      likeName: ow.optional.string,
     },
   }),
   faceController.getAllInfos

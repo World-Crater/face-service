@@ -54,19 +54,15 @@ exports.countAllInfos = async function () {
   }
 }
 
-exports.selectAllInfos = async function (limit, offset, nameFilter = '') {
+exports.selectAllInfos = async function (limit, offset, likeName) {
   try {
-    const checkNameFilter = nameFilter.match(/name='[^~!@#$%^&*()_+|}{.<>/ ]+'/)
-    if (nameFilter !== '' && (!checkNameFilter || checkNameFilter[0] !== nameFilter))
-      throw [null, new Error('Error format')]
-
-    const sqlWhere = nameFilter !== '' ? `WHERE ${nameFilter}` : ''
+    const sqlLIKE = !!likeName ? `WHERE name LIKE '%${likeName}%'` : ''
     const sql = `
     SELECT
     *
     FROM
     faceinfos
-    ${sqlWhere}
+    ${sqlLIKE}
     ORDER BY id
     LIMIT $1 OFFSET $2
     `
