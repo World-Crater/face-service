@@ -29,6 +29,8 @@ def getGirlName(imgItem):
     altStr = str(imgItem.get('alt'))
     name = re.findall(r"[^\x00-\x7F]+", altStr)
     nameStr = ''
+    if len(name) == 0:
+        nameStr = altStr[0:altStr.find(",")] + ','
     for i in name:
         nameStr = nameStr + i + ','
     return nameStr
