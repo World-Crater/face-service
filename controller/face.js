@@ -2,6 +2,9 @@ const faceModel = require('../model/face.js')
 const faceppModel = require('../model/facepp.js')
 const fileServiceModel = require('../model/file-service.js')
 const faceUtil = require('../util/face')
+const orm = require('../ormModel')
+const Faceinfos = orm.faceinfos
+const Op = orm.Sequelize.Op
 
 const faceppObject = new faceppModel(process.env.FACEPP_KEY, process.env.FACEPP_SECRET, process.env.FACEPP_FACESET)
 
@@ -85,24 +88,39 @@ const createInfo = async function (req, res, next) {
   }
 }
 
-const updateInfo = async function (req, res, next) {
+const updateInfo = async function (req, res) {
+  let transaction = null
   try {
-    const previewURL = (await fileServiceModel.uploadImage(`./${req.file.path}`)).body.url
-    const [, insertFaceError] = await faceModel.updateInfo(
-      req.body.name,
-      req.body.romanization,
-      req.body.detail,
-      previewURL,
-      req.params.id
-    )
-    if (insertFaceError) {
-      console.error(insertFaceError)
-      res.status(500).json('Insert database error')
-      return
+    transaction = await orm.sequelize.transaction()
+
+    if (req.file) {
+      const previewURL = (await fileServiceModel.uploadImage(`./${req.file.path}`)).body.url
+      await Faceinfos.update({ preview: previewURL }, { where: { id: { [Op.eq]: req.params.id } } }, { transaction })
     }
+    if (req.body.name) {
+      await Faceinfos.update({ name: req.body.name }, { where: { id: { [Op.eq]: req.params.id } } }, { transaction })
+    }
+    if (req.body.romanization) {
+      await Faceinfos.update(
+        { romanization: req.body.romanization },
+        { where: { id: { [Op.eq]: req.params.id } } },
+        { transaction }
+      )
+    }
+    if (req.body.detail) {
+      await Faceinfos.update(
+        { detail: req.body.detail },
+        { where: { id: { [Op.eq]: req.params.id } } },
+        { transaction }
+      )
+    }
+
+    await transaction.commit()
     res.sendStatus(204)
   } catch (err) {
     console.error(err)
+
+    await transaction.rollback()
     res.status(500).json('Get faces error')
   }
 }

@@ -30,12 +30,15 @@
     "node-fetch": "^2.6.0",
     "nodemon": "^2.0.2",
     "ow": "^0.17.0",
-    "pg": "^7.18.1",
+    "pg": "^7.18.2",
+    "pg-hstore": "^2.3.3",
     "ramda": "^0.27.0",
     "request": "^2.88.2",
-    "request-promise": "^4.2.5"
+    "request-promise": "^4.2.5",
+    "sequelize": "^6.3.3"
   },
   "devDependencies": {
+    "image-size": "^0.8.3",
     "jssoup": "0.0.11",
     "prettier": "2.0.5",
     "x-ray": "^2.3.4"
