@@ -16,7 +16,7 @@ const db = {}
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
-db.facefaces = require('./facefaces.model')(sequelize, Sequelize)
-db.faceinfos = require('./faceinfos.model')(sequelize, Sequelize)
+db.facefaces = require('./facefaces')(sequelize, Sequelize)
+db.faceinfos = require('./faceInfos')(sequelize, Sequelize)
 
 module.exports = db
