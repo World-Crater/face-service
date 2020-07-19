@@ -5,7 +5,10 @@ jobs:
     - stage: build docker image
       if: branch = master
       script:
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker build -t face-service .
-      - docker tag face-service $DOCKER_USERNAME/face-service
-      - docker push $DOCKER_USERNAME/face-service
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker build -t face-service .
+        - docker tag face-service $DOCKER_USERNAME/face-service
+        - docker push $DOCKER_USERNAME/face-service
+
+after_success:
+  - ./scripts/notification.sh
