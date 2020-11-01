@@ -3,6 +3,7 @@ const multer = require('multer')
 const ow = require('ow')
 
 const middlewareValidation = require('../middleware/validation')
+const middlewareFile = require('../middleware/file')
 
 const faceController = require('../controller/face')
 
@@ -24,16 +25,16 @@ router.get(
   faceController.getAllInfos
 )
 
-router.post('/info', upload.single('preview'), faceController.createInfo)
+router.post('/info', upload.single('preview'), faceController.createInfo, middlewareFile.deleteUploadedFile)
 
-router.put('/info/:id', upload.single('preview'), faceController.updateInfo)
+router.put('/info/:id', upload.single('preview'), faceController.updateInfo, middlewareFile.deleteUploadedFile)
 
 router.get('/random', faceController.getRandomFaces)
 
 router.get('/:faceID', faceController.getFacesByID)
 
-router.post('/face', upload.single('image'), faceController.createFacesByImage)
+router.post('/face', upload.single('image'), faceController.createFacesByImage, middlewareFile.deleteUploadedFile)
 
-router.post('/search', upload.single('image'), faceController.searchFacesByImage)
+router.post('/search', upload.single('image'), faceController.searchFacesByImage, middlewareFile.deleteUploadedFile)
 
 module.exports = router
