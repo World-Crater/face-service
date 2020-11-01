@@ -82,6 +82,7 @@ const createInfo = async function (req, res, next) {
     res.json({
       id: insertFaceResult.rows[0].id,
     })
+    next()
   } catch (err) {
     console.error(err)
     res.status(500).json('Get faces error')
@@ -117,6 +118,7 @@ const updateInfo = async function (req, res) {
 
     await transaction.commit()
     res.sendStatus(204)
+    next()
   } catch (err) {
     console.error(err)
 
@@ -151,6 +153,7 @@ const createFacesByImage = async function (req, res, next) {
       facesetToken: process.env.FACEPP_FACESET,
       faceToken: faceToken,
     })
+    next()
   } catch (err) {
     console.error(err)
     res.status(500).json('Get faces error')
@@ -180,6 +183,7 @@ const searchFacesByImage = async function (req, res, next) {
         recognitionPercentage: searchResult.confidence,
       }))
     )
+    next()
   } catch (err) {
     console.error(err)
     res.status(500).json('Search faces error')
