@@ -1,5 +1,7 @@
 const faceModel = require('../model/face.js')
 const faceppModel = require('../model/facepp.js')
+const { promisify } = require("util");
+const fs = require("fs");
 const fileServiceModel = require('../model/file-service.js')
 const faceUtil = require('../util/face')
 const orm = require('../ormModel')
@@ -186,6 +188,7 @@ const searchFacesByImage = async function (req, res, next) {
     next()
   } catch (err) {
     console.error(err)
+    await promisify(fs.unlink)(`./${req.file.path}`);
     res.status(500).json('Search faces error')
   }
 }
