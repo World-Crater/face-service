@@ -1,5 +1,6 @@
 const faceModel = require('../model/face.js')
 const faceppModel = require('../model/facepp.js')
+const faceppValidator = require("../../model/facepp-validator.js")
 const { promisify } = require("util");
 const fs = require("fs");
 const fileServiceModel = require('../model/file-service.js')
@@ -9,6 +10,7 @@ const Faceinfos = orm.faceinfos
 const Op = orm.Sequelize.Op
 
 const faceppObject = new faceppModel(process.env.FACEPP_KEY, process.env.FACEPP_SECRET, process.env.FACEPP_FACESET)
+const faceppObject2 = new faceppModel(process.env.FACEPP_KEY, process.env.FACEPP_SECRET, process.env.FACEPP_FACESET_2)
 
 const getFacesByID = async function (req, res, next) {
   try {
@@ -139,7 +141,19 @@ const createFacesByImage = async function (req, res, next) {
       return
     }
     const faceToken = JSON.parse(detectResult.body).faces[0].face_token
-    const [, addFaceError] = await faceppObject.addFace([faceToken])
+    const [faceppHandler, faceppHandlerErr] = faceppValidator.isFull(
+      JSON.parse(faceppObject.getDetail())
+    )
+      ? [faceppObject, null]
+      : faceppValidator.isFull(JSON.parse(faceppObject2.getDetail()))
+      ? [faceppObject2, null]
+      : [null, new Error("all faceset full")];
+    if (faceppHandlerErr) {
+      console.error(faceppHandlerErr)
+      res.status(500).json('all faceset full')
+      return
+    }
+    const [, addFaceError] = await faceppHandler.addFace([faceToken])
     if (addFaceError) {
       console.error(addFaceError)
       res.status(500).json('Add face error')

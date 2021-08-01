@@ -16,15 +16,15 @@ class facepp {
         method: "POST",
         url: "https://api-cn.faceplusplus.com/facepp/v3/detect",
         headers: {
-          "Content-type": "multipart/form-data"
+          "Content-type": "multipart/form-data",
         },
         qs: {
           api_key: this.faceppKey,
-          api_secret: this.faceppSecret
+          api_secret: this.faceppSecret,
         },
         formData: {
-          image_file: image
-        }
+          image_file: image,
+        },
       });
       return [result, null];
     } catch (err) {
@@ -34,27 +34,27 @@ class facepp {
 
   async search(imagePath, resultCount = 1) {
     try {
-      const image = fs.createReadStream(imagePath)
+      const image = fs.createReadStream(imagePath);
       const result = await request({
         resolveWithFullResponse: true,
         method: "POST",
         url: "https://api-cn.faceplusplus.com/facepp/v3/search",
         headers: {
-          "Content-type": "multipart/form-data"
+          "Content-type": "multipart/form-data",
         },
         qs: {
           api_key: this.faceppKey,
           api_secret: this.faceppSecret,
           faceset_token: this.faceppFaceset,
-          return_result_count: resultCount
+          return_result_count: resultCount,
         },
         formData: {
-          image_file: image
-        }
-      })
-      return [result, null]
+          image_file: image,
+        },
+      });
+      return [result, null];
     } catch (err) {
-      return [null, err]
+      return [null, err];
     }
   }
 
@@ -65,20 +65,42 @@ class facepp {
         method: "POST",
         url: "https://api-cn.faceplusplus.com/facepp/v3/faceset/addface",
         headers: {
-          "Content-type": "application/json"
+          "Content-type": "application/json",
         },
         qs: {
           api_key: this.faceppKey,
           api_secret: this.faceppSecret,
           faceset_token: this.faceppFaceset,
-          face_tokens: faceTokens.length > 1 ? faceTokens.join(",") : faceTokens[0]
-        }
-      })
-      return [result, null]
+          face_tokens:
+            faceTokens.length > 1 ? faceTokens.join(",") : faceTokens[0],
+        },
+      });
+      return [result, null];
     } catch (err) {
-      return [null, err]
+      return [null, err];
+    }
+  }
+
+  async getDetail() {
+    try {
+      const result = await request({
+        resolveWithFullResponse: true,
+        method: "POST",
+        url: "https://api-cn.faceplusplus.com/facepp/v3/faceset/getdetail",
+        headers: {
+          "Content-type": "application/json",
+        },
+        qs: {
+          api_key: this.faceppKey,
+          api_secret: this.faceppSecret,
+          faceset_token: this.faceppFaceset,
+        },
+      });
+      return [result, null];
+    } catch (err) {
+      return [null, err];
     }
   }
 }
 
-module.exports = facepp
+module.exports = facepp;
