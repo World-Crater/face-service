@@ -1,6 +1,6 @@
 const faceModel = require("../model/face.js");
 const faceppModel = require("../model/facepp.js");
-const faceppValidator = require("../../model/facepp-validator.js");
+const faceppValidator = require("../model/facepp-validator.js");
 const { promisify } = require("util");
 const fs = require("fs");
 const fileServiceModel = require("../model/file-service.js");
