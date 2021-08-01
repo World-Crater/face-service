@@ -1,22 +1,22 @@
-const request = require("request-promise")
-const fs = require('fs')
+const request = require("request-promise");
+const fs = require("fs");
 
-function uploadImage (imagePath) {
-  const upload = fs.createReadStream(imagePath)
+function uploadImage(imagePath) {
+  const upload = fs.createReadStream(imagePath);
   return request({
     resolveWithFullResponse: true,
     method: "POST",
     url: `${process.env.FILE_SERVICE}/image/s3`,
     headers: {
-      "Content-type": "multipart/form-data"
+      "Content-type": "multipart/form-data",
     },
     formData: {
-      upload
+      upload,
     },
-    json: true
-  })
+    json: true,
+  });
 }
 
 module.exports = {
-  uploadImage
-}
+  uploadImage,
+};

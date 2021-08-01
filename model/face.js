@@ -1,6 +1,6 @@
-const { Pool } = require('pg')
-const R = require('ramda')
-const _ = require('lodash')
+const { Pool } = require("pg");
+const R = require("ramda");
+const _ = require("lodash");
 
 const pgOptions = {
   host: process.env.PG_ENDPOINT,
@@ -12,12 +12,12 @@ const pgOptions = {
   idleTimeoutMillis: 5000,
   ssl: false,
   connectionTimeoutMillis: 10000,
-}
+};
 
-const pgPool = new Pool(pgOptions)
-pgPool.on('error', function (err) {
-  console.error(`postgresSQL error: ${err}`)
-})
+const pgPool = new Pool(pgOptions);
+pgPool.on("error", function (err) {
+  console.error(`postgresSQL error: ${err}`);
+});
 
 exports.selectAll = async function () {
   try {
@@ -26,37 +26,37 @@ exports.selectAll = async function () {
     *
     FROM
     facefaces
-    `
-    const sqlParams = []
-    return [await pgPool.query(sql, sqlParams), null]
+    `;
+    const sqlParams = [];
+    return [await pgPool.query(sql, sqlParams), null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.countAllInfos = async function () {
   try {
     const sql = `
     SELECT COUNT (id)
     FROM faceinfos
-    `
-    const sqlParams = []
-    const result = await pgPool.query(sql, sqlParams)
+    `;
+    const sqlParams = [];
+    const result = await pgPool.query(sql, sqlParams);
     const count = R.pipe(
-      R.path(['rows', [0], 'count']),
-      (value) => (value === null ? new Error('Count Infos error') : value),
+      R.path(["rows", [0], "count"]),
+      (value) => (value === null ? new Error("Count Infos error") : value),
       parseInt
-    )(result)
-    if (_.isError(count)) throw count
-    return [count, null]
+    )(result);
+    if (_.isError(count)) throw count;
+    return [count, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.selectAllInfos = async function (limit, offset, likeName) {
   try {
-    const sqlLIKE = !!likeName ? `WHERE name LIKE '%${likeName}%'` : ''
+    const sqlLIKE = !!likeName ? `WHERE name LIKE '%${likeName}%'` : "";
     const sql = `
     SELECT
     *
@@ -65,13 +65,13 @@ exports.selectAllInfos = async function (limit, offset, likeName) {
     ${sqlLIKE}
     ORDER BY id
     LIMIT $1 OFFSET $2
-    `
-    const sqlParams = [limit, offset]
-    return [await pgPool.query(sql, sqlParams), null]
+    `;
+    const sqlParams = [limit, offset];
+    return [await pgPool.query(sql, sqlParams), null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.randomSelectInfos = async function (quantity) {
   try {
@@ -81,13 +81,13 @@ exports.randomSelectInfos = async function (quantity) {
     FROM faceinfos
     ORDER BY RANDOM()
     LIMIT $1
-    `
-    const sqlParams = [quantity]
-    return [await pgPool.query(sql, sqlParams), null]
+    `;
+    const sqlParams = [quantity];
+    return [await pgPool.query(sql, sqlParams), null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.selectByID = async function (faceID) {
   try {
@@ -99,14 +99,14 @@ exports.selectByID = async function (faceID) {
     INNER JOIN faceinfos
     ON faceinfos.id = facefaces.infoid
     WHERE faceinfos.id = $1
-    `
-    const sqlParams = [faceID]
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = [faceID];
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.selectByToken = async function (token) {
   try {
@@ -118,18 +118,20 @@ exports.selectByToken = async function (token) {
     INNER JOIN facefaces
     ON faceinfos.id = facefaces.infoid
     WHERE facefaces.token = $1
-    `
-    const sqlParams = [token]
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = [token];
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.selectAllInfoAndTokenByTokens = async function (tokens) {
   try {
-    const sqlCondition = tokens.map((_, index) => `facefaces.token = $${index + 1}`).join(' OR ')
+    const sqlCondition = tokens
+      .map((_, index) => `facefaces.token = $${index + 1}`)
+      .join(" OR ");
     const sql = `
     SELECT
     faceinfos.*, facefaces.token
@@ -138,15 +140,15 @@ exports.selectAllInfoAndTokenByTokens = async function (tokens) {
     INNER JOIN facefaces
     ON faceinfos.id = facefaces.infoid
     WHERE ${sqlCondition}
-    `
-    const sqlParams = tokens
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = tokens;
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    console.log(err)
-    return [null, err]
+    console.log(err);
+    return [null, err];
   }
-}
+};
 
 exports.insertFace = async function (token, preview, infoId) {
   try {
@@ -154,14 +156,14 @@ exports.insertFace = async function (token, preview, infoId) {
     INSERT INTO
     facefaces (token, preview, infoid)
     VALUES ($1, $2, $3);
-    `
-    const sqlParams = [token, preview, infoId]
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = [token, preview, infoId];
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.insertInfo = async function (name, romanization, detail, preview) {
   try {
@@ -170,14 +172,14 @@ exports.insertInfo = async function (name, romanization, detail, preview) {
     faceinfos (name, romanization, detail, preview)
     VALUES ($1, $2, $3, $4)
     RETURNING id
-    `
-    const sqlParams = [name, romanization, detail, preview]
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = [name, romanization, detail, preview];
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.updateInfo = async function (name, romanization, detail, preview, id) {
   try {
@@ -185,14 +187,14 @@ exports.updateInfo = async function (name, romanization, detail, preview, id) {
     UPDATE faceinfos
     SET name=$1, romanization=$2, detail=$3, preview=$4
     WHERE id=$5
-    `
-    const sqlParams = [name, romanization, detail, preview, id]
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = [name, romanization, detail, preview, id];
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
 
 exports.searchInfoIdBySimilarName = async function (similarName) {
   try {
@@ -201,11 +203,11 @@ exports.searchInfoIdBySimilarName = async function (similarName) {
     *
     FROM faceinfos
     WHERE name LIKE $1
-    `
-    const sqlParams = [`%${similarName}%`]
-    const result = await pgPool.query(sql, sqlParams)
-    return [result, null]
+    `;
+    const sqlParams = [`%${similarName}%`];
+    const result = await pgPool.query(sql, sqlParams);
+    return [result, null];
   } catch (err) {
-    return [null, err]
+    return [null, err];
   }
-}
+};
