@@ -1,5 +1,6 @@
 const request = require("request-promise");
 const fs = require("fs");
+const { Right, Left } = require("monet");
 
 class facepp {
   constructor(faceppKey, faceppSecret, faceppFaceset) {
@@ -96,9 +97,9 @@ class facepp {
           faceset_token: this.faceppFaceset,
         },
       });
-      return [result, null];
+      return Right(result);
     } catch (err) {
-      return [null, err];
+      return Left(err);
     }
   }
 }

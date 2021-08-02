@@ -8,6 +8,7 @@ const faceUtil = require("../util/face");
 const orm = require("../ormModel");
 const Faceinfos = orm.faceinfos;
 const Op = orm.Sequelize.Op;
+const { Just, Nothing, None } = require("monet");
 
 const faceppObject = new faceppModel(
   process.env.FACEPP_KEY,
@@ -17,7 +18,11 @@ const faceppObject = new faceppModel(
 const faceppObject2 = new faceppModel(
   process.env.FACEPP_KEY,
   process.env.FACEPP_SECRET,
-  process.env.FACEPP_FACESET_2
+  process.env.FACEPP_FACESET2
+);
+const faceTokenMappingFaceppObject = [faceppObject, faceppObject2].reduce(
+  (prev, curr) => prev.set(curr.faceppFaceset, curr),
+  new Map()
 );
 
 const getFacesByID = async function (req, res, next) {
@@ -172,23 +177,40 @@ const createFacesByImage = async function (req, res, next) {
       `./${req.file.path}`
     );
     if (detectError) {
-      console.error(detectError);
+      console.error(
+        `facepp object detect fail. ${detectError.statusCode}, ${detectError.response.body}`
+      );
       res.status(500).json("Detect face error");
       return;
     }
     const faceToken = JSON.parse(detectResult.body).faces[0].face_token;
-    const [faceppHandler, faceppHandlerErr] = faceppValidator.isFull(
-      JSON.parse(faceppObject.getDetail())
+    const faceppHandlerMaybe = (
+      await Promise.all([faceppObject.getDetail(), faceppObject2.getDetail()])
     )
-      ? [faceppObject, null]
-      : faceppValidator.isFull(JSON.parse(faceppObject2.getDetail()))
-      ? [faceppObject2, null]
-      : [null, new Error("all faceset full")];
-    if (faceppHandlerErr) {
-      console.error(faceppHandlerErr);
-      res.status(500).json("all faceset full");
+      .map((results) =>
+        results
+          .map((result) => JSON.parse(result.body))
+          .flatMap((result) =>
+            faceppValidator.isFull(result) ? Nothing() : Just(result)
+          )
+      )
+      .reduce(
+        (_, curr) =>
+          curr.isJust()
+            ? curr.map((result) =>
+                faceTokenMappingFaceppObject.get(result.faceset_token)
+              )
+            : Nothing(),
+        Nothing()
+      );
+    if (faceppHandlerMaybe.isNothing()) {
+      console.error("facesets all full. please create new faceset");
+      res
+        .status(500)
+        .json({ error: "facesets all full. please create new faceset" });
       return;
     }
+    const faceppHandler = faceppHandlerMaybe.getOrElse({});
     const [, addFaceError] = await faceppHandler.addFace([faceToken]);
     if (addFaceError) {
       console.error(addFaceError);
