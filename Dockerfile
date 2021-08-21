@@ -4,6 +4,8 @@ WORKDIR /face-service
 
 COPY . /face-service
 
+RUN rm .env
+
 RUN npm install
 
 ENTRYPOINT ["npm", "start"]

@@ -244,10 +244,13 @@ const searchFacesByImage = async function (req, res, next) {
       faceppObject.search(`./${req.file.path}`, 3), // TODO: 3的這個參數需改成用req動態帶入
       faceppObject2.search(`./${req.file.path}`, 3), // TODO: 3的這個參數需改成用req動態帶入
     ]);
-    const searchResults = searchResult.reduce(
-      (prev, curr) => [...prev, ...JSON.parse(curr.body).results],
-      []
-    );
+    const searchResults = searchResult
+      .reduce((prev, curr) => [...prev, ...JSON.parse(curr.body).results], [])
+      .sort((a, b) => a.confidence - b.confidence)
+      .map((item) => {
+        console.log(item);
+        return item;
+      });
     const tokens = searchResults.map((token) => token.face_token);
     const [
       tokenInfosResult,

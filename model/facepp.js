@@ -1,6 +1,6 @@
 const request = require("request-promise");
 const fs = require("fs");
-const { Right, Left, Either } = require("monet");
+const { Right, Left } = require("monet");
 
 class facepp {
   constructor(faceppKey, faceppSecret, faceppFaceset) {
