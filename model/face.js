@@ -4,14 +4,10 @@ const _ = require("lodash");
 
 const pgOptions = {
   host: process.env.PG_ENDPOINT,
-  port: process.env.PG_PORT,
+  port: parseInt(process.env.PG_PORT),
   database: process.env.PG_SQL_DATABASE,
   user: process.env.PG_SQL_USER,
   password: process.env.PG_SQL_PASSWORD,
-  max: 5,
-  idleTimeoutMillis: 5000,
-  ssl: false,
-  connectionTimeoutMillis: 10000,
 };
 
 const pgPool = new Pool(pgOptions);

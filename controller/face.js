@@ -240,16 +240,14 @@ const createFacesByImage = async function (req, res, next) {
 
 const searchFacesByImage = async function (req, res, next) {
   try {
-    const [searchResult, searchError] = await faceppObject.search(
-      `./${req.file.path}`,
-      3
-    ); // TODO: 3的這個參數需改成用req動態帶入
-    if (searchError) {
-      console.error(searchError);
-      res.status(500).json("Search face error");
-      return;
-    }
-    const searchResults = JSON.parse(searchResult.body).results;
+    const searchResult = await Promise.all([
+      faceppObject.search(`./${req.file.path}`, 3), // TODO: 3的這個參數需改成用req動態帶入
+      faceppObject2.search(`./${req.file.path}`, 3), // TODO: 3的這個參數需改成用req動態帶入
+    ]);
+    const searchResults = searchResult.reduce(
+      (prev, curr) => [...prev, ...JSON.parse(curr.body).results],
+      []
+    );
     const tokens = searchResults.map((token) => token.face_token);
     const [
       tokenInfosResult,
@@ -257,14 +255,16 @@ const searchFacesByImage = async function (req, res, next) {
     ] = await faceModel.selectAllInfoAndTokenByTokens(tokens);
     if (tokenInfosError) {
       console.error(searchError);
-      res.status(500).json("Search face error");
+      res.status(500).json({
+        message: "Search face error",
+      });
       return;
     }
     const tokenInfosHashMap = faceUtil.tokenInfosToHashMap(
       tokenInfosResult.rows
     );
     res.json(
-      searchResults.map((searchResult) => ({
+      searchResults.slice(-3).map((searchResult) => ({
         ...tokenInfosHashMap.get(searchResult.face_token),
         recognitionPercentage: searchResult.confidence,
       }))
@@ -273,7 +273,9 @@ const searchFacesByImage = async function (req, res, next) {
   } catch (err) {
     console.error(err);
     await promisify(fs.unlink)(`./${req.file.path}`);
-    res.status(500).json("Search faces error");
+    res.status(500).json({
+      message: "Search faces error",
+    });
   }
 };
 
