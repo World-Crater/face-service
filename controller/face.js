@@ -267,7 +267,7 @@ const searchFacesByImage = async function (req, res, next) {
       tokenInfosResult.rows
     );
     res.json(
-      searchResults.slice(-3).map((searchResult) => ({
+      searchResults.slice(0, 3).map((searchResult) => ({
         ...tokenInfosHashMap.get(searchResult.face_token),
         recognitionPercentage: searchResult.confidence,
       }))
