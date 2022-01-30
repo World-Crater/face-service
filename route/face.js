@@ -37,4 +37,6 @@ router.post('/face', upload.single('image'), faceController.createFacesByImage, 
 
 router.post('/search', upload.single('image'), faceController.searchFacesByImage, middlewareFile.deleteUploadedFile)
 
+router.post('/detect', upload.single('image'), faceController.faceDetect, middlewareFile.deleteUploadedFile)
+
 module.exports = router

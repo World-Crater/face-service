@@ -10,6 +10,11 @@ const Faceinfos = orm.faceinfos;
 const Op = orm.Sequelize.Op;
 const { Just, Nothing, None } = require("monet");
 
+const faceppObjectNoFaceSet = new faceppModel(
+  process.env.FACEPP_KEY,
+  process.env.FACEPP_SECRET
+);
+
 const faceppObject = new faceppModel(
   process.env.FACEPP_KEY,
   process.env.FACEPP_SECRET,
@@ -33,14 +38,14 @@ const getFacesByID = async function (req, res, next) {
     if (selectByIDError) {
       console.error(selectByIDError);
       res.status(500).json("Get faces error");
-      return;
+      next();
     }
     res.json(selectByIDResult.rows);
-    return;
+    next();
   } catch (err) {
     console.error(err);
     res.status(500).json("Get faces error");
-    return;
+    next();
   }
 };
 
@@ -66,11 +71,11 @@ const getAllInfos = async function (req, res, next) {
       count: countAllInfosResult,
       rows: selectAllResult.rows,
     });
-    return;
+    next();
   } catch (err) {
     console.error(err);
     res.status(500).json("Get faces error");
-    return;
+    next();
   }
 };
 
@@ -83,14 +88,14 @@ const searchFacesBySimilarName = async function (req, res, next) {
     if (selectByIDError) {
       console.error(selectByIDError);
       res.status(500).json("Get faces error");
-      return;
+      next();
     }
     res.json(selectByIDResult.rows);
-    return;
+    next();
   } catch (err) {
     console.error(err);
     res.status(500).json("Get faces error");
-    return;
+    next();
   }
 };
 
@@ -108,7 +113,7 @@ const createInfo = async function (req, res, next) {
     if (insertFaceError) {
       console.error(insertFaceError);
       res.status(500).json("Insert database error");
-      return;
+      next();
     }
     res.json({
       id: insertFaceResult.rows[0].id,
@@ -117,6 +122,7 @@ const createInfo = async function (req, res, next) {
   } catch (err) {
     console.error(err);
     res.status(500).json("Get faces error");
+    next();
   }
 };
 
@@ -162,9 +168,9 @@ const updateInfo = async function (req, res) {
     next();
   } catch (err) {
     console.error(err);
-
     await transaction.rollback();
     res.status(500).json("Get faces error");
+    next();
   }
 };
 
@@ -181,7 +187,7 @@ const createFacesByImage = async function (req, res, next) {
         `facepp object detect fail. ${detectError.statusCode}, ${detectError.response.body}`
       );
       res.status(500).json("Detect face error");
-      return;
+      next();
     }
     const faceToken = JSON.parse(detectResult.body).faces[0].face_token;
     const faceppHandlerMaybe = (
@@ -208,14 +214,14 @@ const createFacesByImage = async function (req, res, next) {
       res
         .status(500)
         .json({ error: "facesets all full. please create new faceset" });
-      return;
+      next();
     }
     const faceppHandler = faceppHandlerMaybe.getOrElse({});
     const [, addFaceError] = await faceppHandler.addFace([faceToken]);
     if (addFaceError) {
       console.error(addFaceError);
       res.status(500).json("Add face error");
-      return;
+      next();
     }
     const [, insertFaceError] = await faceModel.insertFace(
       faceToken,
@@ -225,7 +231,7 @@ const createFacesByImage = async function (req, res, next) {
     if (insertFaceError) {
       console.error(detectError);
       res.status(500).json("Insert database error");
-      return;
+      next();
     }
     res.json({
       facesetToken: process.env.FACEPP_FACESET,
@@ -235,6 +241,7 @@ const createFacesByImage = async function (req, res, next) {
   } catch (err) {
     console.error(err);
     res.status(500).json("Get faces error");
+    next();
   }
 };
 
@@ -261,7 +268,7 @@ const searchFacesByImage = async function (req, res, next) {
       res.status(500).json({
         message: "Search face error",
       });
-      return;
+      next();
     }
     const tokenInfosHashMap = faceUtil.tokenInfosToHashMap(
       tokenInfosResult.rows
@@ -279,6 +286,31 @@ const searchFacesByImage = async function (req, res, next) {
     res.status(500).json({
       message: "Search faces error",
     });
+    next();
+  }
+};
+
+const faceDetect = async function (req, res, next) {
+  try {
+    const [detectResult, detectError] = await faceppObjectNoFaceSet.detect(
+      `./${req.file.path}`
+    );
+    if (detectError) {
+      console.error(
+        `facepp object detect fail. ${detectError.statusCode}, ${detectError.response.body}`
+      );
+      res.status(404).json("detect face error");
+      next();
+    }
+    res.json(JSON.parse(detectResult.body));
+    next();
+  } catch (err) {
+    console.error(err);
+    await promisify(fs.unlink)(`./${req.file.path}`);
+    res.status(500).json({
+      message: "internal error",
+    });
+    next();
   }
 };
 
@@ -302,4 +334,5 @@ module.exports = {
   getAllInfos,
   createInfo,
   updateInfo,
+  faceDetect,
 };
