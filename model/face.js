@@ -177,6 +177,18 @@ exports.insertInfo = async function (name, romanization, detail, preview) {
   }
 };
 
+exports.deleteInfo = async function (infoID) {
+  try {
+    const sql = `
+    DELETE FROM faceinfos WHERE id=$1;
+    `;
+    const result = await pgPool.query(sql, [infoID]);
+    return [result, null];
+  } catch (err) {
+    return [null, err];
+  }
+};
+
 exports.updateInfo = async function (name, romanization, detail, preview, id) {
   try {
     const sql = `

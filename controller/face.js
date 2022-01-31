@@ -126,6 +126,23 @@ const createInfo = async function (req, res, next) {
   }
 };
 
+const deleteInfo = async function (req, res, next) {
+  try {
+    const [_, deleteInfoError] = await faceModel.deleteInfo(req.params.id);
+    if (deleteInfoError) {
+      console.error(deleteInfoError);
+      res.status(500).json("delete database error");
+      next();
+    }
+    res.sendStatus(204);
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("delete faces error");
+    next();
+  }
+};
+
 const updateInfo = async function (req, res) {
   let transaction = null;
   try {
@@ -333,6 +350,7 @@ module.exports = {
   getRandomFaces,
   getAllInfos,
   createInfo,
+  deleteInfo,
   updateInfo,
   faceDetect,
 };

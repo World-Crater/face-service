@@ -27,6 +27,10 @@ class facepp {
           image_file: image,
         },
       });
+      if (result.statusCode != 200) {
+        console.error(`facepp detect API error. error: ${result}`);
+        throw err;
+      }
       return [result, null];
     } catch (err) {
       return [null, err];

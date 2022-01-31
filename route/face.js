@@ -11,8 +11,6 @@ const upload = multer({ dest: 'other/temp/image' })
 
 router.get('/', faceController.searchFacesBySimilarName)
 
-router.get('/info', faceController.getAllInfos)
-
 router.get(
   '/infos',
   middlewareValidation.checkArguments({
@@ -25,13 +23,17 @@ router.get(
   faceController.getAllInfos
 )
 
+router.get('/info', faceController.getAllInfos)
+
 router.post('/info', upload.single('preview'), faceController.createInfo, middlewareFile.deleteUploadedFile)
 
 router.put('/info/:id', upload.single('preview'), faceController.updateInfo, middlewareFile.deleteUploadedFile)
 
+router.delete('/info/:id', faceController.deleteInfo)
+
 router.get('/random', faceController.getRandomFaces)
 
-router.get('/:faceID', faceController.getFacesByID)
+router.get('/face/:faceID', faceController.getFacesByID)
 
 router.post('/face', upload.single('image'), faceController.createFacesByImage, middlewareFile.deleteUploadedFile)
 
