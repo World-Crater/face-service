@@ -162,21 +162,21 @@ const updateInfo = async function (req, res) {
         { transaction }
       );
     }
-    if (req.body.name) {
+    if (req.body && req.body.name) {
       await Faceinfos.update(
         { name: req.body.name },
         { where: { id: { [Op.eq]: req.params.id } } },
         { transaction }
       );
     }
-    if (req.body.romanization) {
+    if (req.body && req.body.romanization) {
       await Faceinfos.update(
         { romanization: req.body.romanization },
         { where: { id: { [Op.eq]: req.params.id } } },
         { transaction }
       );
     }
-    if (req.body.detail) {
+    if (req.body && req.body.detail) {
       await Faceinfos.update(
         { detail: req.body.detail },
         { where: { id: { [Op.eq]: req.params.id } } },
