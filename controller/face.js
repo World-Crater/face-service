@@ -147,7 +147,7 @@ const deleteInfo = async function (req, res, next) {
   }
 };
 
-const updateInfo = async function (req, res) {
+const updateInfo = async function (req, res, next) {
   let transaction = null;
   try {
     transaction = await orm.sequelize.transaction();
