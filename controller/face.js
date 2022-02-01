@@ -39,6 +39,7 @@ const getFacesByID = async function (req, res, next) {
       console.error(selectByIDError);
       res.status(500).json("Get faces error");
       next();
+      return;
     }
     res.json(selectByIDResult.rows);
     next();
@@ -89,6 +90,7 @@ const searchFacesBySimilarName = async function (req, res, next) {
       console.error(selectByIDError);
       res.status(500).json("Get faces error");
       next();
+      return;
     }
     res.json(selectByIDResult.rows);
     next();
@@ -114,6 +116,7 @@ const createInfo = async function (req, res, next) {
       console.error(insertFaceError);
       res.status(500).json("Insert database error");
       next();
+      return;
     }
     res.json({
       id: insertFaceResult.rows[0].id,
@@ -133,6 +136,7 @@ const deleteInfo = async function (req, res, next) {
       console.error(deleteInfoError);
       res.status(500).json("delete database error");
       next();
+      return;
     }
     res.sendStatus(204);
     next();
@@ -205,6 +209,7 @@ const createFacesByImage = async function (req, res, next) {
       );
       res.status(500).json("Detect face error");
       next();
+      return;
     }
     const faceToken = JSON.parse(detectResult.body).faces[0].face_token;
     const faceppHandlerMaybe = (
@@ -232,6 +237,7 @@ const createFacesByImage = async function (req, res, next) {
         .status(500)
         .json({ error: "facesets all full. please create new faceset" });
       next();
+      return;
     }
     const faceppHandler = faceppHandlerMaybe.getOrElse({});
     const [, addFaceError] = await faceppHandler.addFace([faceToken]);
@@ -239,6 +245,7 @@ const createFacesByImage = async function (req, res, next) {
       console.error(addFaceError);
       res.status(500).json("Add face error");
       next();
+      return;
     }
     const [, insertFaceError] = await faceModel.insertFace(
       faceToken,
@@ -249,6 +256,7 @@ const createFacesByImage = async function (req, res, next) {
       console.error(detectError);
       res.status(500).json("Insert database error");
       next();
+      return;
     }
     res.json({
       facesetToken: process.env.FACEPP_FACESET,
@@ -286,6 +294,7 @@ const searchFacesByImage = async function (req, res, next) {
         message: "Search face error",
       });
       next();
+      return;
     }
     const tokenInfosHashMap = faceUtil.tokenInfosToHashMap(
       tokenInfosResult.rows
@@ -318,6 +327,7 @@ const faceDetect = async function (req, res, next) {
       );
       res.status(404).json("detect face error");
       next();
+      return;
     }
     res.json(JSON.parse(detectResult.body));
     next();
