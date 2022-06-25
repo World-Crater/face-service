@@ -28,7 +28,7 @@
     "jsonwebtoken": "^8.5.1",
     "monet": "^0.9.2",
     "multer": "^1.4.2",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "nodemon": "^2.0.2",
     "ow": "^0.17.0",
     "pg": "^8.7.1",
