@@ -25,7 +25,7 @@
     "express": "^4.17.1",
     "folktale": "^2.3.2",
     "form-data": "^3.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "monet": "^0.9.2",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.0",
