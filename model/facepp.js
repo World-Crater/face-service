@@ -15,7 +15,7 @@ class facepp {
       const result = await request({
         resolveWithFullResponse: true,
         method: "POST",
-        url: "https://api-cn.faceplusplus.com/facepp/v3/detect",
+        url: `${process.env.FACEPP_PROXY_URL}/v3/detect`,
         headers: {
           "Content-type": "multipart/form-data",
         },
@@ -42,7 +42,7 @@ class facepp {
     return request({
       resolveWithFullResponse: true,
       method: "POST",
-      url: "https://api-cn.faceplusplus.com/facepp/v3/search",
+      url: `${process.env.FACEPP_PROXY_URL}/v3/search`,
       headers: {
         "Content-type": "multipart/form-data",
       },
@@ -63,7 +63,7 @@ class facepp {
       const result = await request({
         resolveWithFullResponse: true,
         method: "POST",
-        url: "https://api-cn.faceplusplus.com/facepp/v3/faceset/addface",
+        url: `${process.env.FACEPP_PROXY_URL}/v3/faceset/addface`,
         headers: {
           "Content-type": "application/json",
         },
@@ -86,7 +86,7 @@ class facepp {
       const result = await request({
         resolveWithFullResponse: true,
         method: "POST",
-        url: "https://api-cn.faceplusplus.com/facepp/v3/faceset/getdetail",
+        url: `${process.env.FACEPP_PROXY_URL}/v3/faceset/getdetail`,
         headers: {
           "Content-type": "application/json",
         },
